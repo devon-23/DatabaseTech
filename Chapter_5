@@ -1,0 +1,72 @@
+How to insert, update, and delete data
+
+create table as statement
+	CREATE TABLE table_name AS select_statement
+
+create a complete copy of the Invoices table
+	CREATE TABLE invoices_copy AS
+	SELECT *
+	FROM invoices
+
+UPDATE-------------------------------->
+
+update statement
+	UPDATE table_name
+	SET column_1 = expression_1
+
+Update two columns for a single row
+	UPDATE invoices
+	SET payment_date = '2018-09-21', 
+	    payment_total = 19351.18
+	WHERE invoice_number = '97/522'
+
+Update one column for multiple rows
+	UPDATE invoices
+	SET terms_id = 1
+	WHERE vendor_id = 95
+	(6 rows affected)
+	
+Update one column for one row
+	UPDATE invoices
+	SET credit_total = credit_total + 100
+	WHERE invoice_number = '97/522'
+	(1 row affected)
+
+Safe update mode in MySQL Workbench
+	 By default, MySQL Workbench runs in safe update mode.
+	 Safe update mode prevents you from updating rows if the 
+		WHERE clause is omitted or doesn’t refer to a primary key or 
+		foreign key column.
+	 You can turn safe update mode off by selecting th Edit
+	Preferences command, selecting the SQL Editor node, 
+		changing the “Safe Updates” option, and restarting MySQL 
+		Workbench.
+
+DELETE ------------------------------->
+
+The syntax of the DELETE statement
+	DELETE FROM table_name
+	[WHERE search_condition]
+
+Delete one row
+	DELETE FROM general_ledger_accounts
+	WHERE account_number = 306
+	(1 row affected)
+
+Delete one row using a compound condition
+	DELETE FROM invoice_line_items
+	WHERE invoice_id = 78 AND invoice_sequence = 2
+	(1 row affected)
+
+Delete multiple rows
+	DELETE FROM invoice_line_items
+	WHERE invoice_id = 12
+	(4 rows affected)
+
+Use a subquery in a DELETE statement
+	DELETE FROM invoice_line_items
+	WHERE invoice_id IN
+	    (SELECT invoice_id
+	     FROM invoices
+	     WHERE vendor_id = 115)
+	(4 rows affected)

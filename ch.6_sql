@@ -1,0 +1,65 @@
+/*
+	Chapter 6: Summary Queries
+*/
+
+/*
+	Aggregate Functions:
+    COUNT([DISTINCT] column_name)
+    SUM([DISTINCT] column_name)
+    MIN([DISTINCT] column_name)
+    MAX([DISTINCT] column_name)
+    AVG([DISTINCT] column_name)
+*/
+
+#1 Find the numnber of customers in the customers table
+SELECT COUNT(*)
+FROM customers;
+#Selects all customers and counts how many there are
+
+
+#2 Find how many orders are in the orders table
+SELECT COUNT(order_id)
+FROM orders;
+
+
+#3 Find the number of customers who have made an order
+SELECT COUNT(DISTINCT customer_id)
+FROM orders;
+#DISTINCT removes duplicates
+
+#4 Find the average item_price of ordered items
+SELECT AVG(item_price)
+FROM order_items;
+
+SELECT ROUND(AVG(item_price), 2)
+FROM order_items;
+
+#5 Find the cheapest ordered item
+SELECT MIN(item_price)
+FROM order_items;
+
+#6 Find the most expensive ordered item
+SELECT MAX(first_name)
+FROM customers;
+#min and max work with strings -- A min - Z max
+
+#7 How much in total was paid in tax across all orders?
+SELECT SUM(tax_amount)
+FROM orders;
+
+#8 How much was the most expensive and least expensive ordered items?
+SELECT MAX(item_price), MIN(item_price)
+FROM order_items;
+
+
+/*
+	GROUP BY
+*/
+
+
+
+#9 How many products were purchased in each order?
+SELECT order_id, COUNT(product_id) AS num_items
+FROM order_items
+GROUP BY order_id;
+

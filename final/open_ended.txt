@@ -1,0 +1,294 @@
+/* Write a SELECT statement that returns one row for each vendor in the
+Invoices table that contains these columns:
+The vendor_ id column from the Invoices table
+The sum of the invoice_total columns in the Invoices table for that vendor
+This should return 34 rows.
+*/
+SELECT i.vendor_id, SUM(i.invoice_total)
+FROM invoices i
+GROUP BY i.vendor_id;
+
+/* Write a SELECT statement that returns one row for each vendor that contains
+these columns:
+The vendor_ name column from the Vendors table
+The sum of the payment_total columns in the Invoices table for that vendor
+Sort the result set in descending sequence by the payment total sum for each
+vendor. */
+SELECT v.vendor_name, SUM(i.payment_total)
+FROM vendors v JOIN invoices i
+ON v.vendor_id = i.vendor_id
+GROUP BY v.vendor_name
+ORDER BY SUM(i.payment_total) DESC;
+
+/* Write a SELECT statement that returns one row for each vendor that contains
+three columns:
+The vendor name column from the Vendors table
+The count of the invoices in the Invoices table for each vendor
+The sum of the invoice_total columns in the Invoices table for each vendor
+Sort the result set so the vendor with the most invoices appears first. */
+SELECT v.vendor_name, COUNT(i.invoice_id), SUM(i.invoice_total)
+FROM vendors v JOIN invoices i
+USING(vendor_id)
+GROUP BY v.vendor_id
+ORDER BY COUNT(i.invoice_id) DESC;
+
+
+/* 4 Write a SELECT statement that returns one row for each general ledger
+account number that contains three columns:
+The account_description column from the General_Ledger_Accounts table
+The count of the items in the Invoice Line Items table that have the same
+account number 
+The sum of the line _item_amount columns in the Invoice_Line_Items table
+that have the same account number
+Return only those rows where the count of line items is greater than 1. This
+should return 10 rows.
+Group the result set by the account_description column.
+Sort the result set in descending sequence by the sum of the line item
+amounts. */
+SELECT gla.account_description, COUNT(ili.line_item_amount), 
+SUM(ili.line_item_amount)
+FROM general_ledger_accounts gla JOIN invoice_line_items ili
+USING(account_number)
+GROUP BY gla.account_description
+HAVING COUNT(ili.account_number) > 1
+ORDER BY SUM(ili.line_item_amount) DESC;
+
+/* 5dont work lol hope it aint on thereee */
+SELECT gla.account_description, COUNT(ili.line_item_amount), 
+SUM(ili.line_item_amount)
+FROM general_ledger_accounts gla JOIN invoice_line_items ili
+USING(account_number) JOIN invoices i
+USING(invoice_id)
+GROUP BY gla.account_description
+HAVING COUNT(ili.account_number) > 1 and invoice_date >= '2011-04-01' 
+	and i.invoice_date <= '2011-06-30'
+ORDER BY SUM(ili.line_item_amount) DESC;
+
+/* 6 Write a SELECT statement that answers this question: What is the total
+amount invoiced for each general ledger account number? Return these
+columns:
+The account _number column from the Invoice_Line_Items table
+The sum of the line_item_amount columns from the Invoice_Line_Items
+table
+Use the WITH ROLLUP operator to include a row that gives the grand total.
+This should return 22 rows. */
+SELECT ili.account_number, SUM(ili.line_item_amount)
+FROM invoice_line_items ili
+GROUP BY ili.account_number WITH ROLLUP;
+
+/* 7 Write a SELECT statement that answers this question: Which vendors are
+being paid from more than one account? Return these columns:
+The vendor name column from the Vendors table
+The count of distinct general ledger accounts that apply to that vendor's
+invoices. This should return 2 rows. */
+SELECT v.vendor_name, COUNT(DISTINCT gla.account_number)
+FROM invoice_line_items JOIN general_ledger_accounts gla
+USING(account_number) JOIN invoices
+USING(invoice_id) JOIN vendors v
+USING(vendor_id)
+GROUP BY v.vendor_name
+HAVING COUNT(DISTINCT gla.account_number) > 1;
+
+/* Write a SELECT statement that returns the same result set as this SELECT
+statement, but don't use a join. Instead, use a subquery in a WHERE clause
+that uses the IN keyword.
+	SELECT DISTINCT vendor name
+	FROM vendor JOIN invoices
+	ON vendors. vendor id = invoices. vendor id
+	ORDER BY vendor name; */
+SELECT DISTINCT vendor_name
+FROM vendors
+WHERE vendor_id IN (SELECT vendor_id FROM invoices)
+ORDER BY vendor_name;
+
+/* Write a SELECT statement that answers this question: Which invoices have
+a payment total that's greater than the average payment total for all invoices
+with a payment total greater than 0?
+Return the invoice number and invoice_total columns for each invoice. This
+should return 20 rows. 
+Sort the results by the invoice_total column in descending order.*/
+SELECT i1.invoice_number, i1.invoice_total
+FROM invoices i1
+WHERE i1.payment_total > (SELECT AVG(i2.payment_total) 
+							FROM invoices i2 
+							WHERE i2.payment_total > 0)
+ ORDER BY i1.invoice_total DESC;                      
+
+/* Write a SELECT statement that returns two columns from the
+General_Ledger_Accounts table: account _number and account_description.
+Return one row for each account number that has never been assigned to any
+line item in the Invoice_Line_Items table. To do that, use a subquery intro-
+duced with the NOT EXISTS operator. This should return 54 rows.
+Sort the results by the account _number column. */
+SELECT gla.account_number, gla.account_description
+FROM general_ledger_accounts gla
+WHERE NOT EXISTS (SELECT * 
+	FROM invoice_line_items ili
+    WHERE(ili.account_number = gla.account_number))
+ORDER BY gla.account_number;
+
+
+/* Write a SELECT statement that returns four columns: vendor_name, invoice _id,
+invoice_sequence, and line _item amount.
+Return a row for each line item of each invoice that has more than one line
+item in the Invoice_Line_Items table. Hint: Use a subquery that tests for
+invoice_sequence > 1. This should return 6 rows.
+Sort the results by the vendor_name, invoice _id, and invoice_sequence
+columns. */
+SELECT v.vendor_name, i.invoice_id, ili.invoice_sequence, ili.line_item_amount
+FROM vendors v JOIN invoices i
+USING(vendor_id) JOIN invoice_line_items ili
+USING(invoice_id)
+WHERE i.invoice_id IN (SELECT invoice_id FROM invoice_line_items WHERE 
+invoice_sequence > 1)
+ORDER BY v.vendor_name, i.invoice_id, ili.invoice_sequence;
+
+/* Write a SELECT statement that returns two columns: vendor_id and the
+largest unpaid invoice for each vendor. To do this, you can group the result set
+by the vendor_id column. This should return 7 rows.
+Write a second SELECT statement that uses the first SELECT statement in its
+FROM clause. The main query should return a single value that represents the
+sum of the largest unpaid invoices for each vendor. */
+SELECT SUM(invoice_max) AS sum_of_maximums
+FROM (SELECT vendor_id, MAX(invoice_total) AS invoice_max
+FROM invoices i
+WHERE i.invoice_total - i.credit_total - i.payment_total > 0
+GROUP BY i.vendor_id);
+
+/* Write a SELECT statement that returns the name, city, and state of each
+vendor that's located in a unique city and state. In other words, don't include
+vendors that have a city and state in common with another vendor. This
+should return 38 rows.
+Sort the results by the vendor_state and vendor_city columns. */
+SELECT v.vendor_name, v.vendor_city, v.vendor_state
+FROM vendors v
+WHERE v.vendor_state || v.vendor_city NOT IN (SELECT v2.vendor_state || 
+v2.vendor_city
+	FROM vendors v2
+    GROUP BY v2.vendor_state || v2.vendor_city
+    HAVING COUNT(*) > 1)
+ORDER BY v.vendor_state, v.vendor_city;
+/* not done lol hope it aint this one */
+SELECT DISTINCT vendor_name 
+FROM vendors
+ WHERE vendor_id IN (SELECT vendor_id FROM invoices) 
+ ORDER BY vendor_name;
+ 
+ /* Use a correlated subquery to return one row per vendor, representing the
+vendor's oldest invoice (the one with the earliest date). Each row should
+include these four columns: vendor_name, invoice_number, invoice_date, and
+invoice_total. This should return 34 rows.
+Sort the results by the vendor_name column. */
+SELECT v.vendor_name, i1.invoice_number, i1.invoice_date, i1.invoice_total
+FROM invoices i1 JOIN vendors v
+USING(vendor_id)
+WHERE invoice_date =
+	(SELECT MIN(i2.invoice_date)
+	FROM invoices i2
+	WHERE i2.vendor_id = i1.vendor_id)
+ORDER BY v.vendor_name;
+
+/* Rewrite exercise 7 so it gets the same result but uses an inline view instead of
+a correlated subquery. need to rewrite*/
+SELECT vendor_name, invoice_number AS oldest_invoice,
+oi.oldest_invoice_date, invoice_total
+FROM invoices i JOIN
+(SELECT vendor_id, MIN(invoice_date) AS oldest_invoice_date
+FROM invoices
+GROUP BY vendor_id) oi
+ON (i.vendor_id = oi.vendor_id AND
+i.invoice_date = oi.oldest_invoice_date)
+JOIN vendors v
+ON i.vendor_id = v.vendor_id
+ORDER BY vendor_name;
+
+/* Write a SELECT statement that returns these columns from the Invoices table:
+The invoice total column
+A column that uses the ROUND function to return the invoice total
+column with 1 decimal digit
+A column that uses the ROUND function to return the invoice total
+column with no decimal digits
+A column that uses the TRUNCATE function to return the invoice total
+column with no decimal digits */
+SELECT ROUND(i.invoice_total, 1), ROUND(i.invoice_total, 0), 
+TRUNCATE(i.invoice_total, 0)
+FROM invoices i;
+
+/* Write a SELECT statement that returns these columns from the Date_Sample
+table in the EX database:
+The start date column
+A column that uses the DATE FORMAT function to return the start date
+column with its month name abbreviated and its month, day, and two-digit
+year separated by slashes
+A column that uses the DATE FORMAT function to return the start date
+column with its month and day returned as integers with no leading zeros, a
+two-digit year, and all date parts separated by slashes
+A column that uses the DATE FORMAT function to return the start date
+column with only the hours and minutes on a 12-hour clock with an am/pm
+indicator */
+SELECT DATE_FORMAT(start_date, "%b/%d/%y"), DATE_FORMAT(start_date, "%c/%e/%y"), 
+DATE_FORMAT(start_date, "%h:%i %p"), DATE_FORMAT(start_date, "%c/%e/%y %h:%i %p")
+FROM EX.Date_Sample;
+
+/* Write a SELECT statement that returns these columns from the Vendors table:
+The vendor name column
+The vendor name column in all capital letters
+The vendor _phone column
+A column that displays the last four digits of each phone number
+When you get that working right, add the columns that follow to the result set.
+This is more difficult because these columns require the use of functions within
+functions.
+The vendor_phone column with the parts of the number separated by dots,
+as in 555.555.5555
+A column that displays the second word in each vendor name if there is one
+and blanks if there isn't not completly done*/
+SELECT v.vendor_name, UPPER(v.vendor_name), v.vendor_phone, RIGHT(v.vendor_phone, 
+4), 
+	REPLACE((REPLACE((REPLACE(vendor_phone, '(', ' ')), ') ', '-')), '-', '.') 
+FROM vendors v;
+
+/* Write a SELECT statement that returns these columns from the Invoices table:
+The invoice_number column
+The invoice_date column
+The invoice_date column plus 30 days
+The payment_date column
+A column named days_to_pay that shows the number of days between the
+invoice date and the payment date
+The number of the invoice date's month
+The four-digit year of the invoice date
+When you have this working, add a WHERE clause that retrieves just the
+invoices for the month of May based on the invoice date, not the number of
+the invoice month. */
+SELECT i.invoice_number, i.invoice_date, DATE_ADD(i.invoice_date, INTERVAL 30 DAY), 
+i.payment_date, DATE_FORMAT(i.invoice_date, '%Y')
+FROM invoices i
+WHERE i.invoice_date >= '2018-05-01' AND i.invoice_date < '2018-06-01';
+    
+    
+/* Write a SELECT statement that returns these columns from the String_Sample
+table of the EX database:
+The emp_name column
+A column that displays each employee's first name
+A column that displays each employee's last name
+Use regular expression functions to get the first and last name. If a name
+contains three parts, everything after the first part should be considered part of
+the last name. Be sure to provide for last names with hypes and apostrophes.
+Hint: To include an apostrophe in a pattern, you can code a \ in front of it or
+you can enclose the pattern in double quotes.
+NOT DONEE */
+SELECT
+emp_name ,
+SUBSTRING_INDEX(emp_name,'-',2) AS first_name ,
+SUBSTRING_INDEX(emp_name,'-',-2) AS last_name
+FROM String_Sample ;
+
+/* Write a SELECT statement that returns these columns from the Invoice table
+of the AP database:
+The invoice_number column
+The balance due for each invoice with a balance due greater than zero
+A column that uses the RANK function to rank the balance due in
+descending sequence  also not done ;/*/
+SELECT i.invoice_number, i.invoice_total
+FROM invoices i;
+
+

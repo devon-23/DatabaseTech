@@ -1,0 +1,109 @@
+A table with a two-column primary key contraint
+	CREATE TABLE invoice_line_items
+	(
+		invoice_id 	INT	NOT NULL
+		CONSTAINT line_items_pk
+			PRIMARY KEY (invoice_id)
+	)
+
+A constaint that uses the ON DELETE clause
+	CONSTRAINT invoices_fk_vendors
+		FOREIGN KEY (vendor_id) REFERENCES vendors (vendor_id)
+		ON DELETE CASCADE
+
+Terms to know about constraints -->
+	Column-level contrain
+	table-level contraint
+	not null constraint
+	unique constraint
+	primary key constraint
+	foreign key constraint
+
+A statement that adds a new column
+	ALTER TABLE vendors
+	ADD last_transaction_date DATE
+
+A statment that drops a column
+	ALTER TABLE vedors
+	DROP COLUMN last_transaction_date
+
+changes length of a column
+	ALTER TABLE vendors
+	MODIFY vendor_name VARCHAR(100) NOT NULL
+
+changes type of column
+	ALTER TABLE vendors
+	MODIFY vendor_name CHAR(100) NOT NULL
+
+changes name of column
+	ALTER TABLE vendors
+	RENAME COLUMN vendor_name TO v_name
+
+add primary key constraint
+	ALTER TABLE vendors
+	ADD PRIMARY KEY (vendor_id)
+
+Adds a foreign key constraint
+	ALTER TABLE invoices
+	ADD CONSTRAINT invoices_fk_vendors
+		FOREIGN KEY (vendor_id) REFERENCES vendors (vendor_id)
+
+Drops primary key constraint
+	ALER TABLE vendors
+	DROP PRIMARY KEY
+
+Drops foreign key constraint
+	ALTER TABLE invoices
+	DROP FOREIGN KEY invoices_fk_vendors
+
+Renames a table
+	RENAME TABLE vendors TO vendor
+
+Deletes all data from a table
+	TRUNCATE TABLE vendor
+
+Deletes a table from the current database
+	DROP TABLE vendor
+
+Qualifies the table to be deleted
+	DROP TABLE ex.vendor
+
+CREATING INDEXES--------------------------> speeds up select statements
+sytax of the CREATE INDEX statement
+	CREATE INDEX index_name
+	  ON [dbname.]table_name (column_name_1 ...)
+
+creates and index based on a single column
+	CREATE INDEX invoices_invoice_date_ix
+	  ON invoices (invoice_date)
+
+drop a index
+	DROP INDEX vendors_vendor_phone_ix ON vendors
+
+--------->
+
+common used character sets
+	latin1 //latin language
+	utf8mb3 //standard
+	utf8mb4 //emojis
+
+-------->
+collation names
+	ci - case insenstive
+	cs - case sensitive
+	ai - accent-insensitive
+	as - accent sensitive
+	bin - binary
+------------>
+declare character set and collation at the table level
+	ALTER TABLE employees
+	CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci
+---------
+
+two commonly used storage engines
+	InnoDB
+	MyISAM
+How to view all storage engines for a server
+	SHOW ENGINES
+
+

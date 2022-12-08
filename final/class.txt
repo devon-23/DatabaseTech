@@ -1,0 +1,3 @@
+SELECT i.invoice_due_date, DATE_FORMAT(i.invoice_due_date, '%M/%d/%y'), 
+DATE_FORMAT(i.invoice_due_date, '%c/%e/%y')
+FROM invoices i;

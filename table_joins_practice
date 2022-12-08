@@ -1,0 +1,97 @@
+
+/*
+	List all addresses for Allan Sherwood
+*/
+SELECT c.first_name, c.last_name, a.address_id, a.customer_id, a.line1, 
+a.line2, a.city, a.state, a.zip_code, a.phone, a.disabled
+FROM addresses a
+JOIN customers c ON a.customer_id = c.customer_id
+WHERE c.last_name = 'Sherwood' AND c.first_name = 'Allan';
+
+/*
+	What are all of the products that belong to the 'Guitar' category?
+*/
+select p.*, c.category_name
+from products p
+join categories c on p.category_id = c.category_id
+where c.category_name = 'Guitars';
+
+/*
+	What are all of the products that belong to the 'Basses' category?
+*/
+select p.*
+from products p
+join categories c on p.category_id = c.category_id
+where c.category_name = 'Basses';
+
+/*
+	List all of the customers who have made orders
+*/
+SELECT DISTINCT c.first_name, c.last_name
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id;
+
+/*
+	List the products purchased, order date, and how many were 
+purchased by Allan Sherwood
+*/
+SELECT p.product_name, o.order_date, oi.quantity
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+JOIN order_items oi ON oi.order_id = o.order_id
+JOIN products p ON p.product_id = oi.product_id
+WHERE c.first_name = "Allan" AND c.last_name = "Sherwood";
+
+/*
+	List all of the products from the "Drums" category
+*/
+SELECT p.*
+FROM products p JOIN categories c
+ON p.category_id = c.category_id
+WHERE c.category_name = "drums";
+
+/*
+	List all items ordered by David Goldstein
+*/
+SELECT c.first_name, c.last_name, oi.item_id, c.customer_id, p.list_price, 
+p.product_name
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_items oi ON oi.order_id = o.order_id
+JOIN products p USING(product_id)
+WHERE c.first_name = "David" AND c.last_name = "Goldstein";
+
+
+/*
+	List every customer who purchased a Fender Stratocaster
+*/
+SELECT c.first_name, c.last_name, p.product_name, p.product_id, 
+o.order_date, oi.quantity
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+JOIN order_items oi ON oi.order_id = o.order_id
+JOIN products p USING(product_id)
+WHERE p.product_name = "Fender Stratocaster";
+
+# Outer JOINs
+/*
+	List all categories that don't have any products
+*/
+
+SELECT c.category_name
+FROM categories c
+LEFT JOIN products p ON c.category_id = p.category_id;
+
+/*
+	List all of the customers who have not yet made an order
+*/
+SELECT c.first_name, c.last_name
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.order_date IS NULL;
+
+/* now with a right join */
+SELECT c.first_name, c.last_name
+FROM orders o
+RIGHT JOIN customers c ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;

@@ -1,0 +1,628 @@
+1.	The six clauses of the SELECT statement must be coded in the following 
+order:
+a.	SELECT, FROM, GROUP BY, HAVING, WHERE, ORDER BY
+b.	SELECT, FROM, WHERE, ORDER BY, GROUP BY, HAVING
+xc.	SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY
+d.	SELECT, FROM, ORDER BY, WHERE, GROUP BY, HAVING
+
+
+
+	2.	You can code an expression that results in a date value for all but 
+one of the following aggregate functions. Which one is it?
+a.	MIN	c.x	AVG
+b.	MAX	d.	COUNT
+
+
+
+	3.	Which of the statements below best describes the result set returned 
+by this SELECT statement?
+SELECT COUNT(DISTINCT invoice_id) AS 'count',
+       ROUND(AVG(line_item_amount), 2) AS average_amount
+FROM invoice_line_items
+a.	A single row with a count of the rows in the invoice_line_items table and 
+the average amount of all the line items
+b.x	A single row with a count of the invoices in the invoice_line_items table 
+and the average amount of all the line items
+c.	A row for each of the invoices in the invoice_line_items table with a count 
+of the line items and the average amount of the line items for that invoice
+
+
+
+	4.	Expressions coded in the HAVING clause
+a.x	can use either aggregate search conditions or non-aggregate search 
+conditions
+b.	can use aggregate search conditions but can’t use non-aggregate search 
+conditions
+c.	can use non-aggregate search conditions but can’t use aggregate search 
+conditions
+d.	can refer to any column in the base tables
+
+
+
+	5.	Expressions coded in the WHERE clause
+a.	can use either aggregate search conditions or non-aggregate search 
+conditions
+b.	can use aggregate search conditions but can’t use non-aggregate search 
+conditions
+c.x	can use non-aggregate search conditions but can’t use aggregate search 
+conditions
+d.	must refer to columns in the SELECT clause
+
+
+
+	6.	When a SELECT statement includes a GROUP BY clause, the SELECT 
+clause can include all but one of the following. Which one is it?
+a.	columns used for grouping
+b.	columns that are functionally dependent on a column used for grouping
+c.x	columns that are not functionally dependent on a column used for grouping
+d.	aggregate functions
+
+
+
+	7.	Which of the statements below best describes the result set returned 
+by this SELECT statement?
+SELECT vendor_id,
+       SUM(invoice_total - payment_total - credit_total) AS column_2
+FROM invoices
+WHERE invoice_total - payment_total - credit_total > 0
+GROUP BY vendor_id
+ORDER BY vendor_id
+a.	The unpaid balance for each invoice
+b.x	The total unpaid balance due for each vendor_id
+c.	The total amount invoiced by each vendor_id
+d.	The total of paid invoices for each vendor_id
+
+
+
+	8.	Which of the statements below best describes the result set returned 
+by this SELECT statement?
+SELECT vendor_state, COUNT(*) AS column_2
+FROM vendors
+GROUP BY vendor_state
+HAVING COUNT(*) > 1
+ORDER BY vendor_state
+a.	The names of the vendors in each state
+b.	The duplicate vendors from each state
+c.	The number of vendors in each state
+d.x	The number of vendors in each state that has more than one vendor
+
+
+
+Code example 6-1
+
+SELECT vendor_state, vendor_city, vendor_name, COUNT(*) AS invoice_qty,
+    SUM(invoice_total) AS invoice_average
+FROM invoices JOIN vendors
+    ON invoices.vendor_id = vendors.vendor_id
+WHERE vendor_state < 'e'
+GROUP BY vendor_state, vendor_city, vendor_name
+HAVING SUM(invoice_total) > 500
+ORDER BY vendor_state, vendor_city, vendor_name
+
+	9.	(Please refer to code example 6-1.) When this summary query is 
+executed, the result set will contain one summary row for
+a.	each city with invoice totals over $500
+b.x	each vendor with invoice totals over $500
+c.	each city with invoice average over $500
+d.	each vendor with invoice average over $500
+
+
+
+	10.	(Please refer to code example 6-1.) Although this query runs as 
+coded, it contains this logical error: 
+a.	The condition in the WHERE clause should be coded in the HAVING clause.
+b.x	The column name for the fifth column in the result set doesn’t match the 
+data.
+c.	The three columns in the ORDER BY clause should use the DESC keyword so the 
+city totals will be in the right sequence.
+d.	The condition in the HAVING clause should be coded in the WHERE clause.
+
+
+
+	11.	All but one of the following is true about the WITH ROLLUP operator. 
+Which one is it?
+a.	It adds a summary row for each group specified in the GROUP BY clause.
+b.	It adds a summary row to the end of the result set.
+c.x	It is part of standard SQL.
+d.	It is coded on the GROUP BY clause.
+
+
+
+	12.	What does the GROUPING function do?
+a.	It evaluates an expression and returns 0 if the expression is null because 
+it’s in a summary row.
+b.x	It evaluates an expression and returns 1 if the expression is null because 
+it’s in a summary row.
+c.	It evaluates an expression and returns 0 if the expression is null because 
+it’s the result of grouping a column that can contain null values.
+d.	It evaluates an expression and returns 1 if the expression is null because 
+it’s the result of grouping a column that can contain null values.
+
+
+
+	13.	Which of the following is a common reason for using the IF function 
+with the GROUPING function?
+a.x	To replace the nulls that are generated by WITH ROLLUP with literal values.
+b.	To replace the nulls in grouped columns with literal values.
+c.	To add a summary row for each group only if the group has more than one row.
+d.	To add a summary row for the result set only if the result set has more than 
+one row.
+
+
+
+Code example 6-2
+
+SELECT vendor_id, invoice_date, invoice_total,
+        SUM(invoice_total) OVER() AS total_invoices
+        SUM(invoice_total) OVER(PARTITION BY vendor_id
+            ORDER BY invoice_total) AS vendor_total
+FROM invoices
+
+	14.	(Refer to code example 6-2.) What rows make up the partitions for 
+the first SUM function?
+a.	Each row is treated as a separate partition.
+b.	The rows for each invoice date are treated as a separate partition.
+c.	The rows for each vendor are treated as a separate partition.
+d.x	All of the rows are treated as a single partion.
+
+
+
+	15.	(Refer to code example 6-2.) What rows make up the partitions for 
+the second SUM function?
+a.x	Each row is treated as a separate partition.
+b.	The rows for each invoice date are treated as a separate partition.
+c.	The rows for each vendor are treated as a separate partition.
+d.	All of the rows are treated as a single partion.
+
+
+
+	16.	(Refer to code example 6-2.) What does the ORDER BY clause in the 
+OVER clause for the second SUM function do?
+a.	It sorts all rows in the result set by the invoice_total column.
+b.	It sorts all rows in the result set by the invoice_total column and causes 
+the values in the invoice_total column to be accumulated from one row to the next.
+c.	It sorts the rows for each vendor by the invoice_total column and causes the 
+values in the vendor_id column for each vendor to be accumulated from one row to the 
+next.
+d.x	It sorts the rows for each vendor by the invoice_total column and causes the 
+values in the vendor_total column for each vendor to be accumulated from one row to 
+the next.
+
+
+
+	17.	Which of the following statements is not true about a frame for an 
+aggregate window function?
+a.	It defines a subset of the current partition.
+b.x	If you don’t specify the ending row for a frame, the ending row is the last 
+row in the partition.
+c.	It can be defined as the number of rows before and after the current row.
+d.	It can be defined as a range of values based on the value of the current 
+row.
+
+
+
+	18.	To define peer rows for an aggregate window function, you must 
+include all but one of the following clauses. Which one is it?
+a.	PARTITION BY	c.x	BETWEEN
+b.	RANGE	d.	ORDER BY
+
+
+
+	19.	Which of the following is not true about calculating a moving 
+average for an aggregate window function?
+a.x	The frame must be defined using the ROWS clause.
+b.	The moving average always includes the current row.
+c.	The moving average for the first row in a partition can only include the 
+value of the current row plus the values of any following rows.
+d.	To calculate the average, you must use both the SUM and AVG functions.
+
+
+
+	20.	Which of the following best describes when you should consider using 
+a named window?
+a.	Any time a SELECT statement includes two or more aggregate window functions.
+b.x	Any time a SELECT statement includes two or more aggregate window functions 
+that use partitions.
+c.	Any time a SELECT statement includes two or more aggregate window functions 
+that use the same partitions.
+d.	Any time you want to be able to add to the definitions of two or more 
+aggregate window functions.
+
+
+-------------------------
+
+1.	If introduced as follows, the subquery can return which of the values listed 
+below?
+WHERE vendor_id NOT IN (subquery)
+a.	a single value
+b.	a list of values
+c.x	a table of values
+d.	a subquery can’t be introduced in this way
+
+
+
+	2.	If introduced as follows, the subquery can return which of the 
+values listed below?
+WHERE (subquery)
+a.	a single value
+b.	a list of values
+c.	a table of values
+d.x	a subquery can’t be introduced in this way
+
+
+
+	3.	If introduced as follows, the subquery can return which of the 
+values listed below?
+WHERE 2 < (subquery)
+a.x	a single value
+b.	a list of values
+c.	a table of values
+d.	a subquery can’t be introduced in this way
+
+
+
+	4.	If introduced as follows, the subquery can return which of the 
+values listed below?
+WHERE invoice_total > ALL (subquery)
+a.	a single value
+b.	a list of values
+c.x	a table of values
+d.	a subquery can’t be introduced in this way
+
+
+
+	5.	If introduced as follows, the subquery can return which of the 
+values listed below?
+SELECT (subquery)
+a.x	a single value
+b.	a list of values
+c.	a table of values
+d.	a subquery can’t be introduced in this way
+
+
+
+	6.	If introduced as follows, the subquery can return which of the 
+values listed below?
+FROM (subquery)
+a.x	a single value
+b.	a list of values
+c.	a table of values
+d.	a subquery can’t be introduced in this way
+
+
+
+Code example 7-1
+
+SELECT vendor_name, COUNT(*) AS number_of_invoices,
+       MAX(invoice_total - payment_total - credit_total) AS balance_due
+FROM vendors v 
+  JOIN invoices i
+  ON v.vendor_id = i.vendor_id  
+WHERE invoice_total - payment_total - credit_total >
+    (SELECT AVG(invoice_total - payment_total - credit_total)
+    FROM invoices)
+GROUP BY vendor_name
+ORDER BY balance_due DESC
+
+	7.	(Refer to code example 7-1.) When this query is executed, the result 
+set will contain
+a.	one row for each invoice that has a larger balance due than the average 
+balance due for all invoices
+b.	one row for the invoice with the largest balance due for each vendor
+c.	one row for each invoice for each vendor that has a larger balance due than 
+the average balance due for all invoices
+d.x	one row for each vendor that shows the largest balance due for any of the 
+vendor’s invoices, but only if the balance due is larger than the average balance 
+due for all invoices
+
+
+
+	8.	(Refer to code example 7-1.) When this query is executed, the 
+number_of_invoices for each row will show the number 
+a.	1
+b.	of invoices in the Invoices table
+c.	of invoices for each vendor
+d.x	of invoices for each vendor that has a larger balance due than the average 
+balance due for all invoices
+
+
+
+	9.	(Refer to code example 7-1.) When this query is executed, the rows 
+will be sorted by
+a.	invoice_id
+b.	vendor_id
+c.x	balance_due in descending sequence
+d.	vendor_id and then by balance_due in descending sequence
+
+
+
+Code example 7-2
+
+SELECT i.vendor_id, MAX(i.invoice_total) AS largest_invoice
+FROM invoices i 
+    JOIN 
+      (SELECT vendor_id, AVG(invoice_total) AS average_invoice
+      FROM invoices
+      GROUP BY vendor_id
+      HAVING AVG(invoice_total) > 100) ia
+    ON i.vendor_id = ia.vendor_id
+GROUP BY i.vendor_id
+ORDER BY largest_invoice DESC
+
+	10.	(Refer to code example 7-2.) When this query is executed, the result 
+table will contain one row for 
+a.	each vendor	c.	each invoice
+b. x	each vendor in the table named ia	d.	each invoice in the table 
+named ia
+
+
+
+	11.	(Refer to code example 7-2.) When this query is executed, each row 
+in the result table will show 
+a.x	the largest invoice total related to that row
+b.	the average invoice total related to that row
+c.	the largest invoice total related to that row, but only if it’s larger than 
+the average for all invoices
+d.	the average invoice total related to that row, but only if it’s greater than 
+100
+
+
+	12.	(Refer to code example 7-2.) When this query is executed, there will 
+be one row 
+a.	for each vendor
+b.x	for each vendor with an average invoice total that’s greater than 100
+c.	for each vendor with a maximum invoice total that’s greater than 100
+d.	for each invoice with an invoice total that’s greater than the average 
+invoice total for the vendor and also greater than 100
+
+
+
+	13.	In which of the following ways can you not use a subquery in a 
+SELECT statement?
+a.	In a SELECT clause as a column specification
+b.	In a FROM clause as a table specification
+c.	In a WHERE clause as part of a search condition
+d.x	In an ORDER BY clause as a column specification
+
+
+
+	14.	A subquery can return
+a.x	a single value only
+b.	a list of values only
+c.	a single value or a list of values only
+d.	a single value, a list of values, or a table of values
+
+
+
+	15.	Which of the following is not an advantage of using subqueries over 
+using joins?
+a.	You can use a subquery to pass an aggregate value to the main query.
+b.a	A subquery tends to be more intuitive when it uses an existing relationship 
+between the two tables.
+c.	Long, complex queries can sometimes be easier to code using subqueries.
+
+
+
+	16.	Which of the following statements about a correlated subquery is not 
+true?
+a.	It is executed once for each row in the main query.
+b.	It can’t use the same table as the main query.
+c.x	It must refer to a value that’s provided by a column in the main query.
+d.	It can use a table name or alias to refer to a table in the main query.
+
+
+
+	17.	When the following query is executed, the result set will include 
+one row for each invoice with an invoice total that’s greater than
+SELECT vendor_name, invoice_number, invoice_total
+FROM vendors JOIN invoices ON vendors.vendor_id = invoices.vendor_id
+WHERE invoice_total > ANY
+    (SELECT invoice_total
+     FROM invoices
+     WHERE vendor_state = 'CA')
+a.x	the minimum invoice total for vendors in California
+b.	the maximum invoice total for vendors in California
+c.	the minimum invoice total for vendors in states other than California
+d.	the maximum invoice total for vendors in states other than California
+
+
+ANS:	A
+
+	18.	Which of the following keywords would you use to introduce a 
+subquery if you want to determine if the subquery returns one or more rows?
+a.	ANY	c.x	EXISTS
+b.	SOME	d.	ALL
+
+
+------------------------
+
+1.	If first_name contains Edward and last_name contains Williams, what will the 
+solution column contain when this code is executed?
+CONCAT(LOWER(LEFT('Edward',1)), LOWER(LEFT('Williams',7))) AS solution
+a.	EWilliams
+b.	EWilliam
+c.	ewilliams
+d.x	ewilliam
+
+
+
+	2.	Which of the following is the way to sort a VARCHAR column that 
+contains numbers in numeric sequence? In the ORDER BY clause
+a.	use the CAST function to convert the column values to numbers
+b.	add zeros to the column values using + 0
+c.	use the LPAD function to pad the numbers with leading zeros
+d.x	all of the above
+
+
+
+	3.	If expiration_date contains a value that’s equivalent to November 2, 
+2018 and the SYSDATE function returns a value that’s equivalent to December 17, 
+2018, what will the exp_days column contain when this code is executed?
+expiration_date - SYSDATE() AS exp_days
+a.x	-45
+b.	-1.5
+c.	45
+d.	1.5
+
+
+
+	4.	Which of the following is not a valid way to avoid search problems 
+when you want to search for rows that have a specific date in a column that’s 
+defined with the DATETIME data type? 
+a.	use the MONTH, DAYOFMONTH, and YEAR functions in the WHERE clause to search 
+for just those components
+b.	search for a range of dates that are greater than or equal to the date 
+you’re looking for, and less than the date that follows the date you’re looking for
+c.x	use the DATE_FORMAT function in the WHERE clause to return a formatted 
+string that only contains the month, day, and year
+d.	use the DATE_ADD function to remove the time values from the dates in each 
+column 
+
+
+
+	5.	Which of the following statements best describes what this SELECT 
+statement does?
+SELECT invoice_number, invoice_date,
+  CASE 
+    WHEN (SYSDATE() - invoice_date) >= 30 AND (SYSDATE() - invoice_date) < 60
+      THEN invoice_total
+    ELSE 0
+  END AS "30-60",
+  CASE 
+    WHEN (SYSDATE() - invoice_date) >= 60 AND (SYSDATE() - invoice_date) < 90
+      THEN invoice_total
+    ELSE 0
+  END AS "60-90",
+  CASE 
+    WHEN (SYSDATE() - invoice_date) > 90 THEN invoice_total
+    ELSE 0
+  END AS "Over 90"
+FROM invoices
+a.	Displays three columns for each invoice with a value in the third column 
+that indicates how many days have elapsed between the invoice date and the current 
+date.
+b.x	Displays five columns for each invoice with the invoice total in one of the 
+last three columns based on how many days have elapsed between the invoice date and 
+the current date.
+c.	Displays three columns for each invoice with one of these messages in the 
+third column: 30-60, 60-90, or Over 90.
+d.	Displays five columns for each invoice with a message in one of the last 
+three columns based on how many days have elapsed between the invoice date and the 
+current date.
+
+
+
+	6.	What is the result of the function that follows?
+TRUNCATE(17.87,1)
+a.	10	c.	17.9
+b.x	17.8	d.	17
+
+
+
+	7.	Which of the following functions returns the smallest integer that 
+is greater than or equal to the number?
+a.	FLOOR	c.	SIGN
+b.	TRUNCATE	d.x	CEILING
+
+
+
+	8.	Which code returns the date in the format Friday, April 20th, 2019?
+a.	DATE_FORMAT('2019-04-20', '%D, %M, %Y')
+b.	DATE_FORMAT('2019-04-20', '%m/%d/%y')
+c.x	DATE_FORMAT('2019-04-20', '%W, %M %D, %Y')
+d.	DATE_FORMAT('2019-04-20', '%e-%b-%y')
+
+
+
+	9.	Which function concatenates a string with the specified separator 
+string added in between?
+a.	LTRIM	c. x	CONCAT_WS
+b.	CONCAT	d.	SUBSTRING_INDEX
+
+
+
+	10.	If the column named float_value is a DOUBLE type, which of the 
+following queries will not return values that are approximately equal to 5?
+a.	SELECT float_value
+FROM float_sample
+WHERE float_value BETWEEN 4.99 AND 5.01
+b.x	SELECT float_value
+FROM float_sample
+WHERE float_value = 5
+c.	SELECT float_value
+FROM float_sample
+WHERE ROUND(float_value, 2) = 5.00
+
+
+
+	11.	Which of the following is not typically used to parse a string into 
+its individual components?
+a.	SUBSTRING	c.x	LENGTH
+b.	SUBSTRING_INDEX	d.	LOCATE
+
+
+
+	12.	If the current date is 2019-02-10, what value is returned by the 
+function that follows?
+MONTH(CURDATE())
+a.x	2	c.	February
+b.	Feb	d.	February 2019
+
+
+
+	13.	Which of the following functions would you use to add a specified 
+number of date parts to a date?
+a.	TO_DAYS	c.	LAST_DAY
+b.	DAYOFYEAR	d.x	DATE_ADD
+
+
+
+	14.	What is the result of the function that follows?
+ROUND(2857.83457, -2)
+a.	2857.834	c.	2900.83457
+b.	2857.83	d.x	2900
+
+
+
+	15.	Which of the following functions would you use to test an expression 
+and return a value depending on whether that expression is true or false?
+a.x	IF	c.	CASE
+b.	REPLACE	d.	COALESCE
+
+
+
+	16.	Which of the following functions would you use to substitute a 
+non-null value for a null value?
+a.	IF	c.	CASE
+b.	REPLACE	d.x	COALESCE
+
+
+
+	17.	What happens when the function that follows is executed?
+TRIM('    Joel Murach    ')
+a.	All of the spaces at the beginning of the string are removed.
+b.	All of the spaces at the end of the string are removed.
+c.x	All of the spaces at the beginning and end of the string are removed.
+d.	All of the spaces are removed.
+
+
+
+	18.	Which of the following functions would you use to find a character 
+in a string?
+a.	SUBSTRING	c.	LENGTH
+b.	SUBSTRING_INDEX	d.x	LOCATE
+
+
+
+	19.	What is the result of the function that follows?
+REGEXP_INSTR('TR1-268-468R', '8-4')
+a.	0	c.	6
+b.	1	d.	7
+
+
+
+	20.	What is the result of the function that follows?
+REGEXP_SUBSTR('TR1-268-468R', '[1-9]-[1-9]*[A-Z]')
+a.	268-468R	c.	1-268-
+b.	8-468R	d.	1-268-468R
+

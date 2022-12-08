@@ -1,0 +1,21 @@
+ON --> join condition
+
+DISTINCT --> makes only one result of that
+
+Use join to join the tables --->
+	it must be something they have in common. 
+	if they don't have something in common, 
+	you need to join other tables to it till
+	they finally connect/join.
+
+Ch 4 ---------------->
+NATURAL JOIN --
+	you dont need to specify a join condition,,,
+	it does it automatically
+	can't do natural join if columns don't have
+	the same name (?)
+	ex
+		SELECT *
+		FROM vendors
+		NATURAL JOIN invoices
+

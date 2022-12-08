@@ -1,0 +1,38 @@
+The database state is best described as: ??
+
+Which of the following capabilities are not possible when creating a relational database view?:
+All of the above are possible
+
+What is the principal difference between an EER diagram differ and an ER diagram?:
+The EER diagram introduces the concept of inheritance
+
+A database developer created this table to hold information about cities.  What if anything is wrong 
+with the design?:
+Washington D.C. does not store a value for State 
+
+Please match the ER/EER symbol to the definition of what it depicts-
+rectanlge double lines => weak entity
+a diamond => relationship
+a double line (think ) => total partcicipation
+an oval whose label is underlined => key attribute
+
+What is the difference between the HAVING clause and the WHERE clause?:
+The HAVING clause works on aggregate data, whereas the WHERE clause works on raw data in a table
+
+
+The COMMIT statement will always end a database transaction.
+TRUE
+
+Here are two fields in a Person table:
+
+first_name char(40)
+last_name        varchar(40)
+TRUE
+
+Subqueries may be inserted into:
+The SELECT or WHERE or HAVING or FROM clauses
+
+ Your database needs to store information on Contacts (as a “superclass”), as well as Employees and 
+Vendors (as “subclasses of Contacts”).  There are multiple ways to model this data , for instance:
+CAB
+
